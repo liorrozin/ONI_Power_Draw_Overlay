@@ -1,0 +1,3 @@
+title: Power Draw Overlay
+description: "Color-coded power overlay by Zayats. Wires are colored by how full their circuit is, buildings are colored by how much power they draw right now, and hovering a wire lists the biggest consumers on that circuit."
+staticID: Zayats.PowerDrawOverlay

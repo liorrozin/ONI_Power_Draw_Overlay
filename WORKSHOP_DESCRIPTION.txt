@@ -1,0 +1,21 @@
+[h1]Power Draw Overlay[/h1]
+Colors the power overlay by how much power each circuit and building uses, so you can see where your electricity goes.
+
+[b]What you see[/b]
+[list]
+[*] Wires change color with how full their circuit is, from blue at a light load through green and yellow to red at the limit.
+[*] Buildings that use power are tinted by how much they draw right now, relative to the biggest consumer on screen. Idle and switched-off buildings are gray, and the wattage number above each building uses the same color.
+[*] Hover over a wire to see the biggest consumers on that circuit, with their current and rated wattage. Buildings of the same type are added together.
+[/list]
+
+[b]How to use it[/b]
+Turn it on in the Mods screen, restart the game, and open the power overlay (F2). There are no settings.
+
+[b]Compatibility[/b]
+Works with the base game and Spaced Out. The mod only changes how the overlay looks, so you can add or remove it on an existing save.
+
+If you find a bug, post it in the comments. If the game logged an error that mentions PowerDrawOverlay, include that part of your Player.log.
+
+Made by Zayats.
+
+[url=https://github.com/liorrozin/ONI_Power_Draw_Overlay]Source code on GitHub[/url]

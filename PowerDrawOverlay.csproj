@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>PowerDrawOverlay</AssemblyName>
+    <RootNamespace>PowerDrawOverlay</RootNamespace>
+    <LangVersion>9.0</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Authors>Zayats</Authors>
+    <Copyright>Copyright (c) 2026 Lior Rozin</Copyright>
+    <GameDir Condition="'$(GameDir)' == ''">L:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\</GameDir>
+    <Managed>$(GameDir)OxygenNotIncluded_Data\Managed\</Managed>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(Managed)Assembly-CSharp.dll" Private="false" />
+    <Reference Include="$(Managed)Assembly-CSharp-firstpass.dll" Private="false" />
+    <Reference Include="$(Managed)0Harmony.dll" Private="false" />
+    <Reference Include="$(Managed)Unity.TextMeshPro.dll" Private="false" />
+    <Reference Include="$(Managed)UnityEngine.dll" Private="false" />
+    <Reference Include="$(Managed)UnityEngine.*Module.dll" Private="false" />
+    <Reference Include="$(Managed)UnityEngine.UI.dll" Private="false" />
+  </ItemGroup>
+
+</Project>
