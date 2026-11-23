@@ -19,11 +19,11 @@ namespace PowerDrawOverlay
 		private static readonly Dictionary<ushort, Color32?> wireColors = new Dictionary<ushort, Color32?>();
 		private static readonly HashSet<KBatchedAnimController> tinted = new HashSet<KBatchedAnimController>();
 		private static readonly HashSet<KBatchedAnimController> seen = new HashSet<KBatchedAnimController>();
-		private static readonly List<KeyValuePair<KBatchedAnimController, float>> visible = new List<KeyValuePair<KBatchedAnimController, float>>();
+		private static readonly List<KeyValuePair<KBatchedAnimController, Draw>> visible = new List<KeyValuePair<KBatchedAnimController, Draw>>();
 		private static readonly List<KBatchedAnimController> stale = new List<KBatchedAnimController>();
 		private static bool errorLogged;
 
-		/// <summary>Largest current draw among the buildings on screen. Used to scale colors.</summary>
+		/// <summary>Largest current draw among the buildings on screen. Only used for buildings that are not on a circuit.</summary>
 		internal static float MaxDraw = 1f;
 
 		private static void Postfix(OverlayModes.Power __instance)
@@ -128,18 +128,18 @@ namespace PowerDrawOverlay
 				float used = Mathf.Max(0f, consumer.WattsUsed);
 				maxDraw = Mathf.Max(maxDraw, used);
 				seen.Add(controller);
-				visible.Add(new KeyValuePair<KBatchedAnimController, float>(controller, used));
+				visible.Add(new KeyValuePair<KBatchedAnimController, Draw>(controller, new Draw(used, consumer.CircuitID)));
 			}
 			MaxDraw = Mathf.Max(maxDraw, 1f);
 
 			int layer = LayerMask.NameToLayer("MaskedOverlay");
-			foreach (KeyValuePair<KBatchedAnimController, float> entry in visible)
+			foreach (KeyValuePair<KBatchedAnimController, Draw> entry in visible)
 			{
 				if (tinted.Add(entry.Key))
 				{
 					entry.Key.SetLayer(layer);
 				}
-				entry.Key.TintColour = ColorForDraw(entry.Value);
+				entry.Key.TintColour = ColorForDraw(entry.Value.Watts, entry.Value.Circuit);
 			}
 
 			stale.Clear();
@@ -157,14 +157,39 @@ namespace PowerDrawOverlay
 			}
 		}
 
-		internal static Color32 ColorForDraw(float used)
+		private readonly struct Draw
+		{
+			public readonly float Watts;
+			public readonly ushort Circuit;
+
+			public Draw(float watts, ushort circuit)
+			{
+				Watts = watts;
+				Circuit = circuit;
+			}
+		}
+
+		/// <summary>
+		/// Scales the draw against the safe wattage of the building's own circuit, so a 1000 W draw
+		/// is mild on a 20000 W wire and red on a 1000 W one.
+		/// </summary>
+		internal static Color32 ColorForDraw(float used, ushort circuit)
 		{
 			if (used <= 0f)
 			{
 				return Heat.Idle;
 			}
-			// Square root keeps small consumers visible next to one very large one.
-			return Heat.Gradient(Mathf.Sqrt(used / MaxDraw));
+			float limit = 0f;
+			if (circuit != ushort.MaxValue)
+			{
+				limit = Game.Instance.circuitManager.GetMaxSafeWattageForCircuit(circuit);
+			}
+			if (limit <= 0f)
+			{
+				limit = MaxDraw;
+			}
+			// Square root keeps small consumers visible next to a much larger limit.
+			return Heat.Gradient(Mathf.Sqrt(used / limit));
 		}
 
 		internal static void ResetAll()
@@ -238,7 +263,7 @@ namespace PowerDrawOverlay
 					{
 						continue;
 					}
-					Color color = Power_Update_Patch.ColorForDraw(Mathf.Max(0f, consumer.WattsUsed));
+					Color color = Power_Update_Patch.ColorForDraw(Mathf.Max(0f, consumer.WattsUsed), Game.Instance.circuitManager.GetCircuitID(consumer));
 					label.color = color;
 					unit.color = color;
 				}
